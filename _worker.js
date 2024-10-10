@@ -1,8 +1,7 @@
-// @ts-ignore
 import { connect } from 'cloudflare:sockets';
 
 let userID = '43e8276e-104b-45d7-9dac-b8a1fc7c2a24';
-let proxyIP = '212.192.9.26';
+let proxyIP = 'your-vless-server-domain.com'; // Use domain if possible
 let dohURL = 'https://dns.google/dns-query'; // Optimize DNS resolution
 
 export default {
@@ -23,11 +22,6 @@ export default {
     },
 };
 
-/**
- * Handle regular HTTP requests.
- * @param {Request} request
- * @returns {Response}
- */
 async function handleHTTPRequest(request) {
     const url = new URL(request.url);
     switch (url.pathname) {
@@ -43,11 +37,6 @@ async function handleHTTPRequest(request) {
     }
 }
 
-/**
- * Handle WebSocket upgrade requests for Vless connections.
- * @param {Request} request
- * @returns {Promise<Response>}
- */
 async function handleWebSocketRequest(request) {
     const webSocketPair = new WebSocketPair();
     const [client, server] = Object.values(webSocketPair);
@@ -57,8 +46,12 @@ async function handleWebSocketRequest(request) {
 
     readableStream.pipeTo(new WritableStream({
         async write(chunk) {
-            const tcpSocket = await connectToRemoteServer(chunk);
-            await tcpSocket.writable.getWriter().write(chunk);
+            try {
+                const tcpSocket = await connectToRemoteServer(chunk);
+                await tcpSocket.writable.getWriter().write(chunk);
+            } catch (err) {
+                console.error('Error writing to remote server:', err);
+            }
         },
         close() {
             console.log('WebSocket connection closed');
@@ -71,27 +64,22 @@ async function handleWebSocketRequest(request) {
     return new Response(null, { status: 101, webSocket: client });
 }
 
-/**
- * Connect to the remote server with optimized settings.
- * @param {Uint8Array} data
- * @returns {Promise<Socket>}
- */
 async function connectToRemoteServer(data) {
-    return connect({
-        hostname: proxyIP,
-        port: 443,
-        enableTfo: true,
-        congestionControl: 'bbr',
-        tcpNoDelay: true,
-        tls: { enableFalseStart: true },
-    });
+    try {
+        return connect({
+            hostname: proxyIP,
+            port: 443,
+            enableTfo: true,
+            congestionControl: 'bbr',
+            tcpNoDelay: true,
+            tls: { enableFalseStart: true, serverName: proxyIP }, // Set the serverName for SNI
+        });
+    } catch (err) {
+        console.error('Error connecting to remote server:', err);
+        throw err;
+    }
 }
 
-/**
- * Creates a readable WebSocket stream.
- * @param {WebSocket} server
- * @returns {ReadableStream}
- */
 function makeReadableWebSocketStream(server) {
     return new ReadableStream({
         start(controller) {
@@ -102,12 +90,7 @@ function makeReadableWebSocketStream(server) {
     });
 }
 
-/**
- * Generates a Vless configuration response.
- * @param {string} host
- * @returns {Response}
- */
 function generateVlessConfig(host) {
-    const vlessConfig = `vless://${userID}@${host}:443?encryption=none&security=tls&path=/ws#VLESS`;
+    const vlessConfig = `vless://${userID}@${host}:443?encryption=none&security=tls&sni=${host}&type=ws&host=${host}&path=%2Fws#Worker`;
     return new Response(vlessConfig, { status: 200, headers: { "Content-Type": "text/html" } });
 }
