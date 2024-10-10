@@ -40,8 +40,8 @@ export default {
                             headers: { "Content-Type": "text/plain;charset=utf-8" },
                         });
                     case `/bestip/${userID_Path}`:
-                        const url = `https://sub.xf.free.hr/auto?host=${request.headers.get('Host')}&uuid=${userID}&path=/`;
-                        const bestSubConfig = await fetch(url, { headers: request.headers });
+                        const bestUrl = `https://sub.xf.free.hr/auto?host=${request.headers.get('Host')}&uuid=${userID}&path=/`;
+                        const bestSubConfig = await fetch(bestUrl, { headers: request.headers });
                         return bestSubConfig;
                     default:
                         const randomHostname = cn_hostnames[Math.floor(Math.random() * cn_hostnames.length)];
@@ -71,7 +71,7 @@ export default {
         } catch (err) {
             return new Response(err.toString());
         }
-    },
+    }
 };
 
 // WebSocket handling for optimized connection
@@ -96,7 +96,7 @@ async function handleWebSocketRequest(request) {
         },
         abort(reason) {
             log(`WebSocket stream aborted: ${reason}`);
-        },
+        }
     })).catch((err) => log('WebSocket stream error: ' + err));
 
     return new Response(null, { status: 101, webSocket: client });
