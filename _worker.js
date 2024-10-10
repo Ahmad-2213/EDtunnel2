@@ -127,20 +127,28 @@ async function connectAndWrite(address, port) {
 	 * @returns {Promise<void>} A Promise that resolves when the retry is complete.
 	 */
 	async function retry() {
-		const tcpSocket = await connectAndWrite(พร็อกซีไอพี || addressRemote, portRemote)
-		tcpSocket.closed.catch(error => {
-			console.log('retry tcpSocket closed error', error);
-		}).finally(() => {
-			safeCloseWebSocket(webSocket);
-		})
-		remoteSocketToWS(tcpSocket, webSocket, วเลสResponseHeader, null, log);
-	}
+    try {
+        // Attempt to connect and write to the socket using the proxy IP or addressRemote
+        const tcpSocket = await connectAndWrite(proxyIP || addressRemote, portRemote);
+        tcpSocket.closed.catch(error => {
+            console.log('Retry tcpSocket closed error:', error);
+        }).finally(() => {
+            safeCloseWebSocket(webSocket);
+        });
 
-	const tcpSocket = await connectAndWrite(addressRemote, portRemote);
+        // If successful, pass the tcpSocket to the WebSocket connection
+        remoteSocketToWS(tcpSocket, webSocket, wsResponseHeader, null, log);
+    } catch (error) {
+        console.error('Error during retry connection:', error);
+    }
+}
 
-	// when remoteSocket is ready, pass to websocket
-	// remote--> ws
-	remoteSocketToWS(tcpSocket, webSocket, วเลสResponseHeader, retry, log);
+// Initial connection to remote address and port
+const tcpSocket = await connectAndWrite(addressRemote, portRemote);
+
+// When remoteSocket is ready, pass it to the WebSocket connection
+// Remote --> WebSocket
+remoteSocketToWS(tcpSocket, webSocket, wsResponseHeader, retry, log);
 }
 
 /**
