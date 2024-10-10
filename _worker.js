@@ -12,7 +12,7 @@ import { connect } from 'cloudflare:sockets';
 let userID = '43e8276e-104b-45d7-9dac-b8a1fc7c2a24';
 
 //This is now a default ProxyIP system - you can change it but be careful!
-const พร็อกซีไอพีs = ['cdn.xn--b6gac.eu.org', 'cdn-all.xn--b6gac.eu.org', 'workers.cloudflare.cyou'];
+const พร็อกซีไอพีs = ['212.192.9.26'];
 //ProxyIPs INF: Better to set a IpTamiz for 9th line!
 //How? read line 22 to 24
 
@@ -23,7 +23,7 @@ let พร็อกซีไอพี = พร็อกซีไอพีs[Math.
 // ipv6 พร็อกซีไอพี مثال حذف نظر برای استفاده
 // اجازه دهید พร็อกซีไอพี = "[2a01:4f8:c2c:123f:64:5:6810:c55a]"
 
-let dohURL = 'https://sky.rethinkdns.com/1:-Pf_____9_8A_AMAIgE8kMABVDDmKOHTAKg='; // https://cloudflare-dns.com/dns-query or https://dns.google/dns-query
+let dohURL = 'https://dns.google/dns-query'; // https://cloudflare-dns.com/dns-query or https://dns.google/dns-query
 
 //Better to use IpTamiz from this bot Claxpoint recommend
 // The Best Full Library of IpTamiz Updating everytime and free on telegram bot :
