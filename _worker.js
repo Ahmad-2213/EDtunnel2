@@ -165,7 +165,7 @@ newHeaders.delete('Origin');
 newHeaders.delete('Accept-Language');
 newHeaders.delete('Cookie');
 newHeaders.delete('Cache-Control');
-newHeaders.delete('Accept');
+
 
 	let address = '';
 	let portWithRandomLog = '';
