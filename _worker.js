@@ -158,13 +158,24 @@ async function วเลสOverWSHandler(request) {
 maxPayload: 2097152,// Increase the maximum payload size
 compression: 'deflate',
 	});
-	const newHeaders = new Headers(request.headers);
-    newHeaders.delete('User-Agent');
-newHeaders.delete('Referer');
-newHeaders.delete('Origin');
-newHeaders.delete('Accept-Language');
-newHeaders.delete('Cookie');
-newHeaders.delete('Cache-Control');
+	const unnecessaryHeaders = [
+    'Cookie',
+    'Origin',
+    'Cache-Control',
+    'Pragma',
+    'Accept-Encoding',
+    'Upgrade-Insecure-Requests',
+    'Content-Type',
+    'Content-Length',
+    'DNT'
+];
+
+const newHeaders = new Headers(request.headers);
+
+// Remove unnecessary headers
+unnecessaryHeaders.forEach(header => {
+    newHeaders.delete(header);
+});
 
 
 	let address = '';
