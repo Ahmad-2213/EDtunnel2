@@ -111,7 +111,7 @@ export default {
 						return proxyResponse;
 				}
 			} else {
-				return await วเลสOverWSHandler(request);
+				return await (request);
 			}
 		} catch (err) {
 			/** @type {Error} */ let e = err;
@@ -159,8 +159,13 @@ maxPayload: 2097152,// Increase the maximum payload size
 compression: 'deflate',
 	});
 	const newHeaders = new Headers(request.headers);
-    newHeaders.delete('User-Agent'); // Remove User-Agent for reduced handshake data
-    newHeaders.delete('Referer'); // Remove Referer header
+    newHeaders.delete('User-Agent');
+newHeaders.delete('Referer');
+newHeaders.delete('Origin');
+newHeaders.delete('Accept-Language');
+newHeaders.delete('Cookie');
+newHeaders.delete('Cache-Control');
+newHeaders.delete('Accept');
 
 	let address = '';
 	let portWithRandomLog = '';
