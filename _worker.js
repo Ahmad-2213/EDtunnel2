@@ -158,6 +158,9 @@ async function วเลสOverWSHandler(request) {
 maxPayload: 2097152,// Increase the maximum payload size
 compression: 'deflate',
 	});
+	const newHeaders = new Headers(request.headers);
+    newHeaders.delete('User-Agent'); // Remove User-Agent for reduced handshake data
+    newHeaders.delete('Referer'); // Remove Referer header
 
 	let address = '';
 	let portWithRandomLog = '';
@@ -677,6 +680,7 @@ async function handleUDPOutBound(webSocket, วเลสResponseHeader, log) {
 					method: 'POST',
 					headers: {
 						'content-type': 'application/dns-message',
+						'Cache-Control': 'public, max-age=3600',
 					},
 					body: chunk,
 				})
