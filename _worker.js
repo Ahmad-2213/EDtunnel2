@@ -15,7 +15,13 @@ let พร็อกซีไอพี = พร็อกซีไอพีs[Math.
 // let พร็อกซีไอพี = "[2a01:4f8:c2c:123f:64:5:6810:c55a]"
 
 let dohURL = 'https://cloudflare-dns.com/dns-query'; // https://cloudflare-dns.com/dns-query or https://dns.google/dns-query
-
+const dnsCache = new Map();
+async function resolveDNS(query) {
+  if (dnsCache.has(query)) return dnsCache.get(query);
+  const result = await fetch(dohURL, { method: 'POST', body: query });
+  dnsCache.set(query, result);
+  return result;
+}
 if (!isValidUUID(userID)) {
 	throw new Error('uuid is invalid');
 }
@@ -149,8 +155,9 @@ async function วเลสOverWSHandler(request) {
 	const webSocketPair = new WebSocketPair();
 	const [client, webSocket] = Object.values(webSocketPair);
 	webSocket.accept({
-maxPayload: 1048576, // Increase the maximum payload size
-});
+maxPayload: 2097152,// Increase the maximum payload size
+compression: 'deflate',
+	});
 
 	let address = '';
 	let portWithRandomLog = '';
